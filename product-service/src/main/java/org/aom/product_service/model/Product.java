@@ -1,6 +1,7 @@
 package org.aom.product_service.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,8 +17,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long productId;
-    @NotNull
-    @NotEmpty
+    @NotBlank
     private String productName;
     @NotNull
     @NotEmpty

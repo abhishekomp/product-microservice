@@ -8,11 +8,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 /**
  * @author : Abhishek
@@ -35,6 +37,19 @@ public class GlobalExceptionHandler {
         //return ResponseEntity.notFound().headers(responseHeaders).body(errObj);
         //return ResponseEntity.ok().headers(responseHeaders).body(errObj);
         return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        logger.info("GlobalExceptionHandler:handleMethodArgumentNotValidException() called with exception: {}", ex.getMessage());
+        String customException = ex.getBindingResult().getFieldErrors().stream()
+                .map(x -> x.getField() + " " + x.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        ApiError errObj = new ApiError();
+        errObj.setErrCode(HttpStatus.BAD_REQUEST.value());
+        errObj.setErrorMsg(customException);
+        errObj.setErrorDateTime(LocalDateTime.now());
+        return  ResponseEntity.badRequest().body(errObj);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
