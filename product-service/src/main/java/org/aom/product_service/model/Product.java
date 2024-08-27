@@ -1,6 +1,7 @@
 package org.aom.product_service.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ public class Product {
     @NotNull
     @NotEmpty
     private String productCode;
+    @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal salePrice;
 
     @Enumerated(EnumType.STRING)
