@@ -1,5 +1,6 @@
 package org.aom.product_service.service;
 
+import org.aom.product_service.dto.CreateProductRequest;
 import org.aom.product_service.model.Product;
 import org.aom.product_service.model.ProductCategory;
 import org.aom.product_service.repository.ProductRepository;
@@ -32,7 +33,12 @@ public class ProductService {
         return (List<Product>) byProductCategory;
     }
 
-    public Product save(Product product) {
-        return productRepository.save(product);
+    public Product save(CreateProductRequest productRequest) {
+        Product productToAdd = new Product();
+        productToAdd.setProductName(productRequest.getProductName());
+        productToAdd.setProductCode(productRequest.getProductCode());
+        productToAdd.setProductCategory(ProductCategory.valueOf(productRequest.getProductCategory()));
+        productToAdd.setSalePrice(productRequest.getSalePrice());
+        return productRepository.save(productToAdd);
     }
 }

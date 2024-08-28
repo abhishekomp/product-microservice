@@ -1,6 +1,7 @@
 package org.aom.product_service.controller;
 
 import jakarta.validation.Valid;
+import org.aom.product_service.dto.CreateProductRequest;
 import org.aom.product_service.exception.InvalidProductCategoryException;
 import org.aom.product_service.exception.ProductNotFoundException;
 import org.aom.product_service.model.ApiError;
@@ -58,8 +59,8 @@ public class ProductController {
     }
 
     @PostMapping("/addNewProduct")
-    public Product addNewProduct(@RequestBody @Valid Product product){
-        return productService.save(product);
+    public Product addNewProduct(@RequestBody @Valid CreateProductRequest productRequest){
+        return productService.save(productRequest);
     }
 
 //    @ExceptionHandler(ProductNotFoundException.class)
