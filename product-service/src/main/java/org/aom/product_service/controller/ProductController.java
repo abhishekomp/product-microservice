@@ -1,6 +1,7 @@
 package org.aom.product_service.controller;
 
 import jakarta.validation.Valid;
+import org.aom.product_service.exception.InvalidProductCategoryException;
 import org.aom.product_service.exception.ProductNotFoundException;
 import org.aom.product_service.model.ApiError;
 import org.aom.product_service.model.Product;
@@ -15,6 +16,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,8 +44,16 @@ public class ProductController {
     @GetMapping("/getProductByCategory/{productCategory}")
     public ResponseEntity<List<Product>> getProductByCategory(@PathVariable String productCategory){
         logger.info("ProductController:getProductByCategory() called with productCategory: {}", productCategory);
+        boolean isValidProductCategory = Arrays.stream(ProductCategory.values()).anyMatch((t) -> t.name().equals(productCategory));
+        if(!isValidProductCategory){
+            throw new InvalidProductCategoryException("Invalid value for product category. Valid values are: " + Arrays.toString(ProductCategory.values()));
+        }
         List<Product> products = productService.getProductByCategory(productCategory);
         logger.info("ProductController:getProductByCategory() with productCategory found {} products", products.size());
+        if(products.size() == 0){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            //return ResponseEntity.noContent();
+        }
         return ResponseEntity.ok().body(products);
     }
 

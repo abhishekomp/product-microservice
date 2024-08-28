@@ -39,6 +39,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidProductCategoryException.class)
+    public ResponseEntity<ApiError> handleInvalidProductCategoryException(InvalidProductCategoryException ex){
+        logger.info("GlobalExceptionHandler:handleInvalidProductCategoryException() called with exception: {}", ex.getMessage());
+        ApiError errObj = new ApiError();
+        errObj.setErrCode(HttpStatus.BAD_REQUEST.value());
+        errObj.setErrorMsg(ex.getMessage());
+        errObj.setErrorDateTime(LocalDateTime.now());
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("my-custom-header", "my-custom-value-exception");
+        //return ResponseEntity.notFound().headers(responseHeaders).body(errObj);
+        //return ResponseEntity.ok().headers(responseHeaders).body(errObj);
+        return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         logger.info("GlobalExceptionHandler:handleMethodArgumentNotValidException() called with exception: {}", ex.getMessage());
