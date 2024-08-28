@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.aom.product_service.model.ProductCategory;
+import org.aom.product_service.validation.ValueOfEnum;
 
 import java.math.BigDecimal;
 
@@ -22,6 +23,7 @@ public class CreateProductRequest {
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal salePrice;
 
+    @ValueOfEnum(enumClass = ProductCategory.class)
     private String productCategory;
 
     public CreateProductRequest() {

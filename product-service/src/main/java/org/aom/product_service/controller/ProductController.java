@@ -8,6 +8,7 @@ import org.aom.product_service.model.ApiError;
 import org.aom.product_service.model.Product;
 import org.aom.product_service.model.ProductCategory;
 import org.aom.product_service.service.ProductService;
+import org.aom.product_service.validation.ValueOfEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -47,7 +48,7 @@ public class ProductController {
         logger.info("ProductController:getProductByCategory() called with productCategory: {}", productCategory);
         boolean isValidProductCategory = Arrays.stream(ProductCategory.values()).anyMatch((t) -> t.name().equals(productCategory));
         if(!isValidProductCategory){
-            throw new InvalidProductCategoryException("Invalid value for product category. Valid values are: " + Arrays.toString(ProductCategory.values()));
+            throw new InvalidProductCategoryException("productCategory should be one of these: " + Arrays.toString(ProductCategory.values()));
         }
         List<Product> products = productService.getProductByCategory(productCategory);
         logger.info("ProductController:getProductByCategory() with productCategory found {} products", products.size());
