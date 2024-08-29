@@ -2,6 +2,8 @@ package org.aom.product_service.controller;
 
 import jakarta.validation.Valid;
 import org.aom.product_service.dto.CreateProductRequest;
+import org.aom.product_service.dto.DiscountedPriceRequest;
+import org.aom.product_service.dto.DiscountedPriceResponse;
 import org.aom.product_service.exception.InvalidProductCategoryException;
 import org.aom.product_service.exception.ProductNotFoundException;
 import org.aom.product_service.model.ApiError;
@@ -11,10 +13,8 @@ import org.aom.product_service.service.ProductService;
 import org.aom.product_service.validation.ValueOfEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -63,6 +63,16 @@ public class ProductController {
     public Product addNewProduct(@RequestBody @Valid CreateProductRequest productRequest){
         return productService.save(productRequest);
     }
+
+    @PostMapping("/calculateDiscountedPrice")
+    public DiscountedPriceResponse calculateDiscountedPrice(@RequestBody DiscountedPriceRequest discountedPriceRequest){
+        logger.info("ProductController:calculateDiscountedPrice() was invoked with discountedPriceRequest: {}", discountedPriceRequest);
+        DiscountedPriceResponse discountedPriceResponse = productService.calculateDiscountedPrice(discountedPriceRequest);
+        logger.info("ProductController:calculateDiscountedPrice() received in response discountedPriceResponse: {}", discountedPriceResponse);
+        return discountedPriceResponse;
+    }
+
+
 
 //    @ExceptionHandler(ProductNotFoundException.class)
 //    public ResponseEntity<ApiError> handleProductNotFoundException(ProductNotFoundException ex){

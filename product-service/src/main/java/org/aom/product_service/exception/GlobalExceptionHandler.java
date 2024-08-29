@@ -1,5 +1,8 @@
 package org.aom.product_service.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.aom.product_service.controller.ProductController;
 import org.aom.product_service.model.ApiError;
 import org.slf4j.Logger;
@@ -11,6 +14,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
@@ -39,6 +44,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ApiError> handleProductNotFoundException(ExternalServiceException ex) throws JsonProcessingException {
+        logger.info("GlobalExceptionHandler:handleExternalServiceException() called with exception: {}", ex.getMessage());
+        ApiError errObj = getJSONAsObj(ex.getMessage());
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("my-custom-header", "my-custom-value-exception");
+        //return ResponseEntity.notFound().headers(responseHeaders).body(errObj);
+        //return ResponseEntity.ok().headers(responseHeaders).body(errObj);
+        return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.NOT_FOUND);
+    }
+
+    private ApiError getJSONAsObj(String message) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper.readValue(message, ApiError.class);
+    }
+
     @ExceptionHandler(InvalidProductCategoryException.class)
     public ResponseEntity<ApiError> handleInvalidProductCategoryException(InvalidProductCategoryException ex){
         logger.info("GlobalExceptionHandler:handleInvalidProductCategoryException() called with exception: {}", ex.getMessage());
@@ -53,6 +75,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errObj, responseHeaders, HttpStatus.BAD_REQUEST);
     }
 
+//    @ExceptionHandler(HttpClientErrorException.class)
+//    public ResponseEntity<ApiError> handleHTTPClientError(HttpClientErrorException ex){
+//        logger.info("GlobalExceptionHandler:handleHTTPClientError() called with exception: {}", ex.getMessage());
+//        ResponseEntity<ApiError> apiErrorResponseEntity = null;
+//        if (ex.getStatusCode() == HttpStatus.NOT_FOUND){
+//            ApiError errObj = new ApiError();
+//            errObj.setErrCode(HttpStatus.NOT_FOUND.value());
+//            errObj.setErrorMsg(ex.getCause().getMessage());
+//            errObj.setErrorDateTime(LocalDateTime.now());
+//            HttpHeaders responseHeaders = new HttpHeaders();
+//            responseHeaders.add("my-custom-header", "my-custom-value-exception");
+//            apiErrorResponseEntity = new ResponseEntity<>(errObj, responseHeaders, HttpStatus.NOT_FOUND);
+//        }
+//        return apiErrorResponseEntity;
+//    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         logger.info("GlobalExceptionHandler:handleMethodArgumentNotValidException() called with exception: {}", ex.getMessage());
@@ -63,7 +101,7 @@ public class GlobalExceptionHandler {
         errObj.setErrCode(HttpStatus.BAD_REQUEST.value());
         errObj.setErrorMsg(customException);
         errObj.setErrorDateTime(LocalDateTime.now());
-        return  ResponseEntity.badRequest().body(errObj);
+        return ResponseEntity.badRequest().body(errObj);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
