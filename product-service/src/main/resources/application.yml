@@ -4,9 +4,9 @@ spring:
   application:
     name: product-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/productdb
-    username: product_db_admin
-    password: product_db_admin
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testadmin
+    password: testadmin
   jpa:
     hibernate:
       ddl-auto: create-drop
